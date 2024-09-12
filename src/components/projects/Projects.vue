@@ -1,27 +1,75 @@
 <template>
   <div class="project">
     <div class="search">
-         <v-text-field  hide-details="true" label="Project" placeholder="Project ..." variant="outlined"></v-text-field>
+      <v-text-field
+        :hide-details="true"
+        label="Project"
+        placeholder="Project ..."
+        v-model="search_value"
+        variant="outlined"
+      >
+      </v-text-field>
+
+      <v-btn @click="openCreateModale()">
+        <v-icon size="x-large" icon="mdi-plus"></v-icon>
+      </v-btn>
     </div>
+
     <div>
-        <ListProjects />
+      <ListProjects :list_projects="displayed_list_projects" />
     </div>
+    <CreateProject ref="createModale" @close="handleModaleClosed()" />
   </div>
 </template>
 
 <script lang="ts" setup>
-import ListProjects from './ListProjects.vue'
+import { onMounted, ref, useTemplateRef, watch } from "vue";
+import ProjectsCommand, { Project } from "../../tauri_commands/projects";
+import ListProjects from "./ListProjects.vue";
+import CreateProject from "./CreateProject.vue";
+import { useProjectStore } from "../../stores/projects";
 
+const projectStore = useProjectStore();
+
+const createModale = useTemplateRef("createModale");
+const displayed_list_projects = ref<Project[]>([]);
+const search_value = ref<String>("");
+
+onMounted(async () => {
+  await updateListProjects();
+  displayed_list_projects.value = projectStore.projects;
+});
+
+watch(search_value, (value) => {
+  if (value) {
+    displayed_list_projects.value = projectStore.projects.filter(
+      (e) =>
+        e.name.startsWith(value.valueOf()) || e.name.includes(value.valueOf())
+    );
+  } else {
+    displayed_list_projects.value = projectStore.projects;
+  }
+});
+async function updateListProjects() {
+  projectStore.setProjects(await ProjectsCommand.get_projects());
+}
+function openCreateModale() {
+  createModale.value?.openModale();
+}
+async function handleModaleClosed() {
+  await updateListProjects();
+}
 </script>
 
 <style scoped lang="scss">
-.project{
+.project {
   width: 100%;
-  margin: 40px ;
-
+  margin: 40px;
 }
-.search{
+.search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   margin-bottom: 10px;
 }
-
 </style>

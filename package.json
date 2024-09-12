@@ -10,10 +10,14 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@mdi/font": "^7.4.47",
+    "@tauri-apps/api": "^1.6.0",
+    "pinia": "^2.2.2",
+    "tauri-plugin-sql-api": "github:tauri-apps/tauri-plugin-sql#v1",
+    "vee-validate": "^4.13.2",
     "vue": "^3.4.37"
   },
   "devDependencies": {
+    "@mdi/font": "^7.4.47",
     "@tauri-apps/cli": "^1.6.1",
     "@types/node": "^22.5.2",
     "@vitejs/plugin-vue": "^5.1.3",

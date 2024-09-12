@@ -1,27 +1,34 @@
-<script setup lang="ts">
-import {ref} from "vue";
-
-const list_tasks = ref<{ name: string; project: string; description: string }[]>([
-  {name: "Fix le header 1", project: "AppStock", description: "Project 1"},
-  {name: "Project 2", project: "SudokuSolver", description: "Project 2"},
-]);
-</script>
-
 <template>
-  <div v-for="(task,index) in list_tasks" :key="index" class="product_card">
+  <div v-for="(task, index) in list_tasks" :key="index" class="product_card">
     <v-card class="card" color="indigo">
-
-
       <v-card-title>
         <div class="card_head">
           <p>{{ task.name }}</p>
-          <p> {{ task.project }}</p>
+
+          <p>{{ renderTasksProjectName(task.project_id) }}</p>
         </div>
       </v-card-title>
-      <v-card-subtitle>{{task.description}}</v-card-subtitle>
+      <v-card-subtitle>{{ task.description }}</v-card-subtitle>
     </v-card>
   </div>
 </template>
+<script setup lang="ts">
+import { useProjectStore } from "../../stores/projects";
+import { Task } from "../../tauri_commands/tasks";
+
+defineProps({
+  list_tasks: Array<Task>,
+});
+
+const projectStore = useProjectStore();
+function renderTasksProjectName(project_id: number | null) {
+  if (project_id)
+    return (
+      projectStore.projects.filter((e) => e.id == project_id)[0]?.name || ""
+    );
+  else return "";
+}
+</script>
 
 <style scoped lang="scss">
 .product_card {
@@ -35,6 +42,5 @@ const list_tasks = ref<{ name: string; project: string; description: string }[]>
 .card_head {
   display: flex;
   justify-content: space-between;
-
 }
 </style>
