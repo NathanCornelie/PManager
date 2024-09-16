@@ -48,7 +48,7 @@ function openModale() {
 
 function submitForm() {
   ProjectsCommand.create_project(
-    new Project(name.value, path.value, description.value)
+    new Project(0, name.value, path.value, description.value)
   );
 }
 </script>

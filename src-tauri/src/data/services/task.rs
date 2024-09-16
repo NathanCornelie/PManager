@@ -1,10 +1,9 @@
-use crate::data::models::Task;
 use rusqlite::Connection;
 
-pub fn create_task(conn: &Connection, name: &str,project_id:&str, desc: &str) {
+pub fn create_task(conn: &Connection, name: &str, project_id: &str, desc: &str) {
     conn.execute(
         "INSERT INTO tasks (name,project_id,description) VALUES (?1,?2,?3)",
-        &[&name,&project_id, &desc],
+        &[&name, &project_id, &desc],
     )
     .unwrap();
     println!("Task {} created", { name });
@@ -29,4 +28,7 @@ pub fn create_task(conn: &Connection, name: &str,project_id:&str, desc: &str) {
 pub fn delete_task(conn: &Connection, id: &i32) {
     conn.execute("DELETE FROM `tasks` WHERE `id`= (?1) ", &[&id])
         .unwrap();
+}
+pub fn delete_tasks(conn: &Connection) {
+    conn.execute("DELETE FROM tasks", []).unwrap();
 }

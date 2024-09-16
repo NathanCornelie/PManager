@@ -10,15 +10,19 @@
       >
       </v-text-field>
 
-      <v-btn @click="openCreateModale()">
+      <v-btn @click="openDisplayDialog()">
         <v-icon size="x-large" icon="mdi-plus"></v-icon>
       </v-btn>
     </div>
 
     <div>
-      <ListProjects :list_projects="displayed_list_projects" />
+      <ListProjects
+        :list_projects="displayed_list_projects"
+        @open-display-modale="openCreateModale()"
+      />
     </div>
     <CreateProject ref="createModale" @close="handleModaleClosed()" />
+    <DisplayProject ref="displayDialog" @close="handleDisplayModaleCosed()" />
   </div>
 </template>
 
@@ -28,9 +32,10 @@ import ProjectsCommand, { Project } from "../../tauri_commands/projects";
 import ListProjects from "./ListProjects.vue";
 import CreateProject from "./CreateProject.vue";
 import { useProjectStore } from "../../stores/projects";
-
+import DisplayProject from "./DisplayProject.vue";
 const projectStore = useProjectStore();
 
+const displayDialogProject = useTemplateRef("displayDialog");
 const createModale = useTemplateRef("createModale");
 const displayed_list_projects = ref<Project[]>([]);
 const search_value = ref<String>("");
@@ -38,6 +43,7 @@ const search_value = ref<String>("");
 onMounted(async () => {
   await updateListProjects();
   displayed_list_projects.value = projectStore.projects;
+  projectStore.setSelectedProject(projectStore.projects[0] || null);
 });
 
 watch(search_value, (value) => {
@@ -56,9 +62,13 @@ async function updateListProjects() {
 function openCreateModale() {
   createModale.value?.openModale();
 }
+function openDisplayDialog() {
+  displayDialogProject.value?.openDialog();
+}
 async function handleModaleClosed() {
   await updateListProjects();
 }
+function handleDisplayModaleCosed() {}
 </script>
 
 <style scoped lang="scss">

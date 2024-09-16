@@ -1,9 +1,9 @@
-use app::data::{connection, models::Project, task::Task};
+use app::data::{ models::Project, task::Task};
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
 
-use crate::state;
+// ! database location : /home/nathan/.local/share/com.tauri.devprojects
 
 const CURRENT_DB_VERSION: u32 = 3;
 
@@ -12,6 +12,7 @@ pub fn initialize_database(app_handle: &AppHandle) -> Result<Connection, rusqlit
         .path_resolver()
         .app_data_dir()
         .expect("The app data directory should exist. ");
+    
     fs::create_dir_all(&app_dir).expect("The app data directory should be created");
     let sqlite_path = app_dir.join("PManager.sqlite");
 

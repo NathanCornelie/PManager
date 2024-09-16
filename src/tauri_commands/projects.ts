@@ -4,8 +4,14 @@ export class Project {
   name: string = "";
   path: string = "";
   description: string = "";
-  constructor(name: string, path: string, description: string) {
+  constructor(
+    id: number = 0,
+    name: string = "",
+    path: string = "",
+    description: string = ""
+  ) {
     this.name = name;
+    this.id = id;
     this.description = description;
     this.path = path;
   }
@@ -13,11 +19,11 @@ export class Project {
 
 export default abstract class ProjectsCommand {
   static async get_projects(): Promise<Project[]> {
-    return  invoke("get_projects");
+    return invoke("get_projects");
   }
 
   static async create_project(project: Project): Promise<Project> {
-    return  invoke("create_project", {
+    return invoke("create_project", {
       name: project.name,
       path: project.path,
       description: project.description,

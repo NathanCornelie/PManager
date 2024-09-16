@@ -8,6 +8,7 @@
       <v-card
         :title="project.name"
         :subtitle="project.path"
+        @click="displayProject()"
         color="indigo"
       ></v-card>
     </div>
@@ -15,12 +16,15 @@
 </template>
 
 <script lang="ts" setup>
-
 import { Project } from "../../tauri_commands/projects";
 
 defineProps({
   list_projects: Array<Project>,
 });
+const emit = defineEmits(["openDisplayModale"]);
+function displayProject() {
+  emit("openDisplayModale");
+}
 </script>
 
 <style lang="scss" scoped>
