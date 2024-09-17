@@ -27,6 +27,7 @@ pub fn create_project(conn: &Connection, product: &ProjectCreate) {
     .unwrap();
 }
 
+
 pub fn delete_project(conn: &Connection, id: &i32) {
     conn.execute("DELETE FROM `projects` WHERE `id`= (?1) ", &[&id])
         .unwrap();

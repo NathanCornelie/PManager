@@ -10,18 +10,6 @@ use tauri::{AppHandle, InvokeError, Manager, State};
 mod database;
 mod state;
 
-#[tauri::command]
-fn greet(app_handle: AppHandle, name: &str) -> String {
-    // Should handle errors instead of unwrapping here
-    app_handle.db(|db| database::add_item(name, db)).unwrap();
-
-    let items = app_handle.db(|db| database::get_all(db)).unwrap();
-
-    let items_string = items.join(" | ");
-    print!("Your name log: {}", items_string);
-    format!("Your name log: {}", items_string)
-}
-
 // remember to call `.manage(MyState::default())`
 #[tauri::command]
 fn get_projects(app_handle: AppHandle) -> Result<Vec<Project>, InvokeError> {
@@ -64,12 +52,20 @@ async fn create_task(
     Ok(())
 }
 #[tauri::command]
-async fn delete_task_cmd(app_handle: AppHandle, task_id: &str) -> Result<(), InvokeError> {
-    println!("called");
+async fn delete_task(app_handle: AppHandle, task_id: &str) -> Result<(), InvokeError> {
     app_handle.db(|db| {
         let _ = app::data::services::task::delete_task(db, &task_id.parse::<i32>().unwrap());
     });
     println!("task  {} deleted", task_id);
+    Ok(())
+}
+// remember to call `.manage(MyState::default())`
+#[tauri::command]
+async fn update_task(app_handle: AppHandle, task: Task) -> Result<(), InvokeError> {
+    app_handle.db(|db| {
+        let _ = app::data::services::task::update_task(db, &task);
+    });
+    println!("task  {} updated", &task.id);
     Ok(())
 }
 
@@ -79,12 +75,12 @@ fn main() {
             db: Default::default(),
         })
         .invoke_handler(tauri::generate_handler![
-            greet,
             get_projects,
             create_project,
             create_task,
-            delete_task_cmd,
-            get_tasks
+            delete_task,
+            get_tasks,
+            update_task
         ])
         .setup(|app| {
             let handle = app.handle();

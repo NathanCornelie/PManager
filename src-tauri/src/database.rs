@@ -1,4 +1,4 @@
-use app::data::{ models::Project, task::Task};
+use app::data::{models::Project, task::Task};
 use rusqlite::{named_params, Connection};
 use std::fs;
 use tauri::AppHandle;
@@ -12,7 +12,7 @@ pub fn initialize_database(app_handle: &AppHandle) -> Result<Connection, rusqlit
         .path_resolver()
         .app_data_dir()
         .expect("The app data directory should exist. ");
-    
+
     fs::create_dir_all(&app_dir).expect("The app data directory should be created");
     let sqlite_path = app_dir.join("PManager.sqlite");
 
@@ -54,23 +54,6 @@ pub fn upgrade_database_if_needed(
     Ok(())
 }
 
-pub fn add_item(title: &str, db: &Connection) -> Result<(), rusqlite::Error> {
-    let mut statement = db.prepare("INSERT INTO items (title) VALUES (@title)")?;
-    statement.execute(named_params! {"@title": title})?;
-    Ok(())
-}
-
-pub fn get_all(db: &Connection) -> Result<Vec<String>, rusqlite::Error> {
-    let mut statement = db.prepare("SELECT * FROM items")?;
-    let mut rows = statement.query([])?;
-    let mut items = Vec::new();
-    while let Some(row) = rows.next()? {
-        let title: String = row.get("title")?;
-        items.push(title);
-    }
-
-    Ok(items)
-}
 
 pub fn get_projects(db: &Connection) -> Result<Vec<Project>, rusqlite::Error> {
     let mut statement = db.prepare("SELECT * FROM projects")?;
@@ -97,6 +80,7 @@ pub fn get_tasks(db: &Connection) -> Result<Vec<Task>, rusqlite::Error> {
             row.get("name")?,
             row.get("description")?,
             row.get("project_id")?,
+            row.get("priority")?,
         );
         items.push(task)
     }

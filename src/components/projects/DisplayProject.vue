@@ -54,7 +54,7 @@ import { Task } from "../../tauri_commands/tasks";
 
 defineExpose({ openDialog });
 
-const isActive = ref<boolean>(true);
+const isActive = ref<boolean>(false);
 const projectStore = useProjectStore();
 const taskStore = useTasksStore();
 const displayedTask = ref<Task | null>(null);

@@ -1,4 +1,8 @@
-use rusqlite::Connection;
+use std::collections::HashMap;
+
+use rusqlite::{params_from_iter, Connection, Error};
+
+use crate::data::task::Task;
 
 pub fn create_task(conn: &Connection, name: &str, project_id: &str, desc: &str) {
     conn.execute(
@@ -24,7 +28,34 @@ pub fn create_task(conn: &Connection, name: &str, project_id: &str, desc: &str) 
 //     }
 //     Ok(tasks)
 // }
+pub fn update_task(conn: &Connection,  task: &Task) -> Result<(), Error> {
+    let params = task.to_HashMap();
 
+    let mut set_clause: Vec<String> = params
+        .iter()
+        .map(|(col, _)| {
+            if params.get(col) != None {
+                format!("{} = ?", col)
+            } else {
+                String::from("")
+            }
+        })
+        .collect();
+    set_clause.retain(|x| !x.is_empty());
+
+    let set_clause_str = set_clause.join(", ");
+
+    let mut values: Vec<&str> = params
+        .iter()
+        .map(|(_, val)| if !val.is_empty() { val.as_str() } else { "" })
+        .collect();
+    values.retain(|&x| !x.is_empty());
+
+    let query = format!("UPDATE tasks SET {} WHERE id={}", set_clause_str, task.id);
+    conn.execute(&query, params_from_iter(values))?;
+    println!("Row updated successfully in table: {}", "tasks");
+    Ok(())
+}
 pub fn delete_task(conn: &Connection, id: &i32) {
     conn.execute("DELETE FROM `tasks` WHERE `id`= (?1) ", &[&id])
         .unwrap();

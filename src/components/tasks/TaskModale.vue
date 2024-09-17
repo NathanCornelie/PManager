@@ -31,14 +31,14 @@
             </v-autocomplete>
             <v-autocomplete
               class="pl-2"
-              v-model="tasksStore.selectedTask.value.status"
-              label="Status"
-              :items="STATUS"
+              v-model="tasksStore.selectedTask.value.priority"
+              label="Priority"
+              :items="PRIORITY"
               variant="outlined"
               chips
             >
-              <template v-slot:chip="{ item: item_status }">
-                {{ item_status.raw }}
+              <template v-slot:chip="{ item: item_priority }">
+                {{ item_priority.raw }}
               </template>
             </v-autocomplete>
           </div>
@@ -60,6 +60,7 @@
           <v-btn class="me-4" v-if="mode == TypeVals.edit" @click="editTask()">
             Save
           </v-btn>
+          {{ editedTask.id }}
         </form>
       </div>
     </v-card>
@@ -92,8 +93,10 @@ const projectStore = useProjectStore();
 const mode = ref<TypeVals>(TypeVals.create);
 const project = ref<Project | undefined>(undefined);
 const overlay = ref<boolean>(false);
-const STATUS = ref<String[]>(["URGENT", "IMPORTANT", "NORMAL"]);
+const PRIORITY = ref<String[]>(["URGENT", "IMPORTANT", "NORMAL"]);
 const emptyProject = ref<Project>(new Project(0, "Pas de projet"));
+const editedTask = ref<Task>(new Task());
+
 watch(overlay, () => {
   if (!overlay.value) {
     emit("close");
@@ -102,6 +105,13 @@ watch(overlay, () => {
 watch(project, () => {
   tasksStore.selectedTask.value.project_id = project.value?.id || 0;
 });
+
+watch(
+  () => tasksStore.selectedTask.value,
+  (newValue) => {
+    editedTask.value = newValue as Task;
+  }
+);
 function openModale(value: string) {
   if (value === "edit") mode.value = TypeVals.edit;
   else mode.value = TypeVals.create;
@@ -120,7 +130,7 @@ async function submitForm() {
       new Task(
         tasksStore.selectedTask.value.name,
         tasksStore.selectedTask.value.project_id || undefined,
-        tasksStore.selectedTask.value?.status,
+        tasksStore.selectedTask.value?.priority,
         tasksStore.selectedTask.value.description
       )
     ).then(() => (overlay.value = false));
@@ -133,7 +143,11 @@ async function deleteTask() {
     );
   }
 }
-async function editTask() {}
+async function editTask() {
+  if (editedTask.value.id) {
+    TasksCommand.update_task(editedTask.value);
+  }
+}
 </script>
 
 <style></style>

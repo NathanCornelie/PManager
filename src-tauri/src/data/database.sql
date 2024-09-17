@@ -3,7 +3,7 @@ create table
         id integer primary key autoincrement,
         path varchar,
         name varchar not null,
-        description varchar
+        description varchardescription
     );
 
 create table

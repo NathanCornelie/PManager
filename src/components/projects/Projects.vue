@@ -10,7 +10,7 @@
       >
       </v-text-field>
 
-      <v-btn @click="openDisplayDialog()">
+      <v-btn @click="openCreateModale()">
         <v-icon size="x-large" icon="mdi-plus"></v-icon>
       </v-btn>
     </div>
@@ -18,7 +18,7 @@
     <div>
       <ListProjects
         :list_projects="displayed_list_projects"
-        @open-display-modale="openCreateModale()"
+        @open-display-modale="openDisplayModale()"
       />
     </div>
     <CreateProject ref="createModale" @close="handleModaleClosed()" />
@@ -62,7 +62,7 @@ async function updateListProjects() {
 function openCreateModale() {
   createModale.value?.openModale();
 }
-function openDisplayDialog() {
+function openDisplayModale() {
   displayDialogProject.value?.openDialog();
 }
 async function handleModaleClosed() {
