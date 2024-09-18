@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import Project from './components/projects/Projects.vue'
-import Tasks from './components/tasks/Tasks.vue'
+import Project from "./components/projects/Projects.vue";
+import Tasks from "./components/tasks/Tasks.vue";
 </script>
 
 <template>
   <div class="app">
-
     <div class="main_container">
-      <Project/>
-      <Tasks/>
+      <Project />
+      <Tasks />
     </div>
-
   </div>
 </template>
 
@@ -20,11 +18,17 @@ import Tasks from './components/tasks/Tasks.vue'
   height: 100vh;
 
   .main_container {
-
     display: flex;
     justify-content: center;
-
+    div {
+      &:first-child {
+        width: 40%;
+        min-width: 200px;
+      }
+      &:nth-child(2) {
+        width: 40%;
+      }
+    }
   }
 }
-
 </style>

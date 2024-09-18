@@ -31,7 +31,7 @@ export default abstract class TasksCommand {
     });
   }
   static async delete_task(id: number): Promise<number> {
-    return invoke("delete_task_cmd", { taskId: id.toString() });
+    return invoke("delete_task", { taskId: id.toString()});
   }
   static async update_task(task: Task): Promise<Task> {
     return invoke("update_task", {

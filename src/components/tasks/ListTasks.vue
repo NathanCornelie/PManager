@@ -1,6 +1,6 @@
 <template>
   <div v-for="(task, index) in list_tasks" :key="index" class="product_card">
-    <v-card class="card" color="indigo" @click="editTask(task)">
+    <v-card class="card" :color="getCardColor(task)" @click="editTask(task)">
       <v-card-title>
         <div class="card_head">
           <p>{{ task.name }}</p>
@@ -8,7 +8,9 @@
           <p>{{ renderTasksProjectName(task.project_id) }}</p>
         </div>
       </v-card-title>
-      <v-card-subtitle>{{ task.description }}</v-card-subtitle>
+      <v-card-subtitle style="font-weight: bold">{{
+        task.description
+      }}</v-card-subtitle>
     </v-card>
   </div>
 </template>
@@ -28,6 +30,17 @@ function renderTasksProjectName(project_id: number | null) {
     );
   else return "";
 }
+function getCardColor(task: Task) {
+  switch (task.priority) {
+    case "URGENT":
+      return "red";
+    case "IMPORTANT":
+      return "orange-darken-2";
+    default:
+      return "green-accent-3";
+  }
+}
+
 function editTask(task: Task) {
   emit("displayEditModale", task);
 }

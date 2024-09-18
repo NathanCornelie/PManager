@@ -18,7 +18,7 @@
     <div>
       <ListProjects
         :list_projects="displayed_list_projects"
-        @open-display-modale="openDisplayModale()"
+        @open-display-modale="openDisplayModale"
       />
     </div>
     <CreateProject ref="createModale" @close="handleModaleClosed()" />
@@ -62,7 +62,8 @@ async function updateListProjects() {
 function openCreateModale() {
   createModale.value?.openModale();
 }
-function openDisplayModale() {
+function openDisplayModale(project: Project) {
+  projectStore.setSelectedProject(project);
   displayDialogProject.value?.openDialog();
 }
 async function handleModaleClosed() {
@@ -73,7 +74,6 @@ function handleDisplayModaleCosed() {}
 
 <style scoped lang="scss">
 .project {
-  width: 100%;
   margin: 40px;
 }
 .search {

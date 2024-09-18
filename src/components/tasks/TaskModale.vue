@@ -47,20 +47,38 @@
             v-model="tasksStore.selectedTask.value.description"
             label="Description"
           ></v-textarea>
-          <v-btn class="me-4" v-if="mode == TypeVals.create" type="submit">
-            Create
-          </v-btn>
-          <v-btn
-            class="me-4"
+
+          <div
             v-if="mode == TypeVals.edit"
-            @click="deleteTask()"
+            class="d-flex justify-space-between"
           >
-            Delete
-          </v-btn>
-          <v-btn class="me-4" v-if="mode == TypeVals.edit" @click="editTask()">
-            Save
-          </v-btn>
-          {{ editedTask.id }}
+            <div>
+              <v-btn
+                class="me-4"
+                @click="deleteTask()"
+                style="background-color: #f44336"
+              >
+                Delete
+              </v-btn>
+              <v-btn
+                class="me-4"
+                v-if="mode == TypeVals.edit"
+                @click="editTask()"
+                style="background-color: #2196f3"
+              >
+                Save
+              </v-btn>
+            </div>
+            <v-btn
+              class="me-4"
+              v-if="mode == TypeVals.edit"
+              type="submit"
+              style="background-color: #69f0ae"
+            >
+              Done
+            </v-btn>
+          </div>
+          <v-btn class="me-4" v-else type="submit"> Create </v-btn>
         </form>
       </div>
     </v-card>
@@ -129,7 +147,7 @@ async function submitForm() {
     TasksCommand.create_task(
       new Task(
         tasksStore.selectedTask.value.name,
-        tasksStore.selectedTask.value.project_id || undefined,
+        tasksStore.selectedTask.value.project_id,
         tasksStore.selectedTask.value?.priority,
         tasksStore.selectedTask.value.description
       )
@@ -145,7 +163,9 @@ async function deleteTask() {
 }
 async function editTask() {
   if (editedTask.value.id) {
-    TasksCommand.update_task(editedTask.value);
+    TasksCommand.update_task(editedTask.value).then(
+      () => (overlay.value = false)
+    );
   }
 }
 </script>

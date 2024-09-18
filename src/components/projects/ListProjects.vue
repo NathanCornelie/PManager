@@ -8,7 +8,7 @@
       <v-card
         :title="project.name"
         :subtitle="project.path"
-        @click="displayProject()"
+        @click="displayProject(project)"
         color="indigo"
       ></v-card>
     </div>
@@ -22,8 +22,8 @@ defineProps({
   list_projects: Array<Project>,
 });
 const emit = defineEmits(["openDisplayModale"]);
-function displayProject() {
-  emit("openDisplayModale");
+function displayProject(project: Project) {
+  emit("openDisplayModale", project);
 }
 </script>
 

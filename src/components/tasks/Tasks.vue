@@ -57,7 +57,6 @@ function displayEditModale(task: Task) {
 
 <style scoped lang="scss">
 .tasks {
-  width: 100%;
   margin: 40px;
 }
 

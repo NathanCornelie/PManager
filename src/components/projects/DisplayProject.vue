@@ -27,7 +27,7 @@
             <div class="w-33">
               <v-list>
                 <v-list-item
-                  v-for="task in taskStore.tasks"
+                  v-for="task in projectTasks"
                   :key="task.id"
                   @click="displayTask(task)"
                   :title="task.name"
@@ -40,14 +40,19 @@
         </div>
       </template>
       <template v-slot:actions="">
-        <v-btn @click="isActive = false">Close</v-btn>
+        <v-btn
+          @click="isActive = false"
+          color="white"
+          style="background-color: red"
+          >Close</v-btn
+        >
       </template>
     </v-card>
   </v-dialog>
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, watch } from "vue";
 import { useProjectStore } from "../../stores/projects";
 import { useTasksStore } from "../../stores/tasks";
 import { Task } from "../../tauri_commands/tasks";
@@ -58,11 +63,23 @@ const isActive = ref<boolean>(false);
 const projectStore = useProjectStore();
 const taskStore = useTasksStore();
 const displayedTask = ref<Task | null>(null);
-
+const projectTasks = ref<Task[]>([]);
 onMounted(() => {
-  displayedTask.value = taskStore.tasks[0];
+  projectTasks.value =
+    taskStore.tasks.filter(
+      (e) => e.project_id == projectStore.selectedProject?.id
+    ) || [];
+  displayedTask.value = projectTasks.value[0];
 });
-
+watch(isActive, (val) => {
+  if (val) {
+    projectTasks.value =
+      taskStore.tasks.filter(
+        (e) => e.project_id == projectStore.selectedProject?.id
+      ) || [];
+    displayedTask.value = projectTasks.value[0];
+  }
+});
 function openDialog() {
   isActive.value = true;
 }

@@ -1,15 +1,24 @@
 use std::collections::HashMap;
 
-use rusqlite::{params_from_iter, Connection, Error};
+use rusqlite::{params, params_from_iter, Connection, Error};
 
 use crate::data::task::Task;
 
 pub fn create_task(conn: &Connection, name: &str, project_id: &str, desc: &str) {
-    conn.execute(
-        "INSERT INTO tasks (name,project_id,description) VALUES (?1,?2,?3)",
-        &[&name, &project_id, &desc],
-    )
-    .unwrap();
+    if (project_id.to_string() == String::from("0")) {
+        conn.execute(
+            "INSERT INTO tasks (name,project_id,description) VALUES (?1,?2,?3)",
+            params![&name, None::<i32>, &desc],
+        )
+        .unwrap();
+    } else {
+        conn.execute(
+            "INSERT INTO tasks (name,project_id,description) VALUES (?1,?2,?3)",
+            &[&name, &project_id, &desc],
+        )
+        .unwrap();
+    }
+
     println!("Task {} created", { name });
 }
 
@@ -28,7 +37,7 @@ pub fn create_task(conn: &Connection, name: &str, project_id: &str, desc: &str) 
 //     }
 //     Ok(tasks)
 // }
-pub fn update_task(conn: &Connection,  task: &Task) -> Result<(), Error> {
+pub fn update_task(conn: &Connection, task: &Task) -> Result<(), Error> {
     let params = task.to_HashMap();
 
     let mut set_clause: Vec<String> = params
