@@ -12,7 +12,7 @@
       </v-btn>
     </div>
     <ListTasks
-      :list_tasks="tasksStore.tasks"
+     
       @display-edit-modale="displayEditModale"
     />
     <CreateTask

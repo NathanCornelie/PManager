@@ -3,10 +3,7 @@
     <v-card style="width: 500px" class="pa-5">
       <div class="">
         <form @submit.prevent="submitForm">
-          <v-text-field
-            v-model="tasksStore.selectedTask.value.name"
-            label="Name"
-          ></v-text-field>
+          <v-text-field v-model="editedTask.name" label="Name"></v-text-field>
           <div class="d-flex justify-space-between">
             <v-autocomplete
               class="pr-1"
@@ -31,7 +28,7 @@
             </v-autocomplete>
             <v-autocomplete
               class="pl-2"
-              v-model="tasksStore.selectedTask.value.priority"
+              v-model="editedTask.priority"
               label="Priority"
               :items="PRIORITY"
               variant="outlined"
@@ -44,9 +41,20 @@
           </div>
 
           <v-textarea
-            v-model="tasksStore.selectedTask.value.description"
+            v-model="editedTask.description"
             label="Description"
           ></v-textarea>
+
+          <div>
+            <v-checkbox
+              density="compact"
+              v-for="sub in editedTask.subtasks"
+              :key="sub.id"
+              :label="sub.value"
+              v-model="sub.done"
+              hide-details
+            ></v-checkbox>
+          </div>
 
           <div
             v-if="mode == TypeVals.edit"
@@ -72,7 +80,7 @@
             <v-btn
               class="me-4"
               v-if="mode == TypeVals.edit"
-              type="submit"
+              @click="validateTask()"
               style="background-color: #69f0ae"
             >
               Done
@@ -87,7 +95,7 @@
 
 <script lang="ts" setup>
 import { onMounted, ref, watch } from "vue";
-import TasksCommand, { Task } from "../../tauri_commands/tasks";
+import TasksCommand, { SubTask, Task } from "../../tauri_commands/tasks";
 import { Project } from "../../tauri_commands/projects";
 import { useTasksStore } from "../../stores/tasks";
 import { storeToRefs } from "pinia";
@@ -96,7 +104,6 @@ import { useProjectStore } from "../../stores/projects";
 defineExpose({
   openModale,
 });
-onMounted(() => {});
 
 enum TypeVals {
   create,
@@ -119,15 +126,30 @@ watch(overlay, () => {
   if (!overlay.value) {
     emit("close");
   }
+  editedTask.value.subtasks = [
+    new SubTask(1, false, "Substask 1"),
+    new SubTask(2, false, "Substask 2"),
+    new SubTask(3, false, "Substask 3"),
+  ];
 });
 watch(project, () => {
-  tasksStore.selectedTask.value.project_id = project.value?.id || 0;
+  editedTask.value.project_id = project.value?.id || 0;
+});
+onMounted(() => {
+  editedTask.value = JSON.parse(
+    JSON.stringify(tasksStore.selectedTask.value)
+  ) as Task;
+  editedTask.value.subtasks = [
+    new SubTask(1, false, "Substask 1"),
+    new SubTask(2, false, "Substask 2"),
+    new SubTask(3, false, "Substask 3"),
+  ];
 });
 
 watch(
   () => tasksStore.selectedTask.value,
   (newValue) => {
-    editedTask.value = newValue as Task;
+    editedTask.value = JSON.parse(JSON.stringify(newValue)) as Task;
   }
 );
 function openModale(value: string) {
@@ -146,10 +168,12 @@ async function submitForm() {
   if (tasksStore.selectedTask.value) {
     TasksCommand.create_task(
       new Task(
-        tasksStore.selectedTask.value.name,
-        tasksStore.selectedTask.value.project_id,
-        tasksStore.selectedTask.value?.priority,
-        tasksStore.selectedTask.value.description
+        editedTask.value.id,
+        editedTask.value.name,
+        editedTask.value.description,
+        editedTask.value.project_id,
+        editedTask.value?.priority,
+        editedTask.value?.status
       )
     ).then(() => (overlay.value = false));
   }
@@ -163,6 +187,14 @@ async function deleteTask() {
 }
 async function editTask() {
   if (editedTask.value.id) {
+    TasksCommand.update_task(editedTask.value).then(
+      () => (overlay.value = false)
+    );
+  }
+}
+async function validateTask() {
+  if (editedTask.value.id) {
+    editedTask.value.status = "DONE";
     TasksCommand.update_task(editedTask.value).then(
       () => (overlay.value = false)
     );

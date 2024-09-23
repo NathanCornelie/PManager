@@ -41,6 +41,7 @@ const displayed_list_projects = ref<Project[]>([]);
 const search_value = ref<String>("");
 
 onMounted(async () => {
+  
   await updateListProjects();
   displayed_list_projects.value = projectStore.projects;
   projectStore.setSelectedProject(projectStore.projects[0] || null);
