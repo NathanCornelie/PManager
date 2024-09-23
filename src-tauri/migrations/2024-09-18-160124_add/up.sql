@@ -1,13 +1,4 @@
--- Your SQL goes here
-create table
-    projects (
-        id integer primary key autoincrement,
-        path varchar,
-        name varchar not null,
-        description varchar
-    );
-
-create table
+CREATE TABLE
     tasks_new (
         id integer PRIMARY KEY AUTOINCREMENT,
         name VARCHAR NOT NULL,
@@ -16,10 +7,12 @@ create table
         priority VARCHAR,
         due_date DATETIME,
         pinned BOOLEAN,
+        status VARCHAR DEFAULT 'CREATED',
         FOREIGN KEY (project_id) references projects (id)
     );
 
-insert into
+-- Copier les données de l'ancienne table vers la nouvelle
+INSERT INTO
     tasks_new (
         id,
         name,
@@ -27,14 +20,24 @@ insert into
         project_id,
         priority,
         due_date,
-        pinned
+        pinned,
+        status
     )
-select
-    *
-from
+SELECT
+    id,
+    name,
+    description,
+    project_id,
+    priority,
+    due_date,
+    pinned,
+    'CREATED'
+FROM
     tasks;
 
-drop table tasks;
+-- Supprimer l'ancienne table
+DROP TABLE tasks;
 
-alter table tasks_new
-rename to tasks;
+-- Renommer la nouvelle table avec le nom original
+ALTER TABLE tasks_new
+RENAME TO tasks;

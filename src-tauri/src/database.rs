@@ -1,9 +1,9 @@
 use app::data::{models::Project, task::Task};
-use rusqlite::{named_params, Connection};
+use rusqlite::Connection;
 use std::fs;
 use tauri::AppHandle;
 
-// ! database location : /home/nathan/.local/share/com.tauri.devprojects
+// ! database location : /home/nathan/.local/share/com.tauri.dev/PManager.sqlite
 
 const CURRENT_DB_VERSION: u32 = 3;
 
@@ -54,7 +54,6 @@ pub fn upgrade_database_if_needed(
     Ok(())
 }
 
-
 pub fn get_projects(db: &Connection) -> Result<Vec<Project>, rusqlite::Error> {
     let mut statement = db.prepare("SELECT * FROM projects")?;
     let mut rows = statement.query([])?;
@@ -81,6 +80,8 @@ pub fn get_tasks(db: &Connection) -> Result<Vec<Task>, rusqlite::Error> {
             row.get("description")?,
             row.get("project_id")?,
             row.get("priority")?,
+            row.get("status")?,
+            Vec::new(),
         );
         items.push(task)
     }
